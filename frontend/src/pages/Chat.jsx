@@ -33,10 +33,13 @@ export default function Chat() {
     if (currentUser) {
       socket.current = io(host);
       socket.current.emit("add-user", currentUser._id);
+      socket.current.on("onlineUsers", payload=>{
+        console.log("payload=>", payload);
+      })
     }
   }, [currentUser]);
 
-  // get request to allUserRoute API, getting currentUser's all contacts and storing it in contacts state variable
+
   useEffect(async () => {
     if (currentUser) {
       if (currentUser.isAvatarImageSet) {
