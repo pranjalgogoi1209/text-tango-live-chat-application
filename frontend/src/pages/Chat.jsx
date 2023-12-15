@@ -29,8 +29,12 @@ export default function Chat() {
     if (currentUser) {
       socket.current = io(host);
       socket.current.emit("add-user", currentUser._id);
+      socket.current.on("onlineUsers", payload=>{
+        console.log("payload=>", payload);
+      })
     }
   }, [currentUser]);
+
 
   useEffect(async () => {
     if (currentUser) {
