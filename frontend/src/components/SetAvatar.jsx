@@ -28,7 +28,7 @@ export default function SetAvatar() {
     theme: "dark",
   };
 
-  // post request to setAvatarRoute API
+  // post request to setAvatarRoute API while click on the submit button
   const setProfilePicture = async () => {
     if (selectedAvatar === undefined) {
       toast.error("Please select an avatar", toastOptions);
