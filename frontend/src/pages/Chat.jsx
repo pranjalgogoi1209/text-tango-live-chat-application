@@ -11,9 +11,11 @@ import Welcome from "../components/Welcome";
 export default function Chat() {
   const navigate = useNavigate();
   const socket = useRef();
+  const [currentUser, setCurrentUser] = useState(undefined);
   const [contacts, setContacts] = useState([]);
   const [currentChat, setCurrentChat] = useState(undefined);
-  const [currentUser, setCurrentUser] = useState(undefined);
+
+  // getting current user details from local host and storing it in currentUser state variable
   useEffect(async () => {
     if (!localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
       navigate("/login");
@@ -25,6 +27,8 @@ export default function Chat() {
       );
     }
   }, []);
+
+  // emitting currenct user details to host API
   useEffect(() => {
     if (currentUser) {
       socket.current = io(host);
@@ -46,16 +50,19 @@ export default function Chat() {
       }
     }
   }, [currentUser]);
-  const handleChatChange = (chat) => {
+
+  // updating the currentChat state variable from chatContainer component
+  const handleChatChange = chat => {
     setCurrentChat(chat);
   };
+
   return (
     <>
       <Container>
         <div className="container">
           <Contacts contacts={contacts} changeChat={handleChatChange} />
           {currentChat === undefined ? (
-            <Welcome />
+            <Welcome currentUser={currentUser} />
           ) : (
             <ChatContainer currentChat={currentChat} socket={socket} />
           )}
@@ -71,13 +78,13 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1rem;
   align-items: center;
-  background-color: #131324;
+  gap: 1rem;
+  background-color: #f1f1f1;
   .container {
-    height: 85vh;
-    width: 85vw;
-    background-color: #00000076;
+    background-color: #f1f1f1;
+    height: 100vh;
+    width: 100vw;
     display: grid;
     grid-template-columns: 25% 75%;
     @media screen and (min-width: 720px) and (max-width: 1080px) {

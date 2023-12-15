@@ -43,7 +43,7 @@ export default function Login() {
     return true;
   };
 
-  // post request to loginRoute API
+  // post request to loginRoute API while successfully submitting the register form
   const handleSubmit = async event => {
     event.preventDefault();
     if (validateForm()) {
