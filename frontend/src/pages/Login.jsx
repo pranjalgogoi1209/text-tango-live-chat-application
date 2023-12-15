@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { useNavigate, Link } from "react-router-dom";
-import Logo from "../assets/logo.svg";
+import Logo from "../assets/logo.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { loginRoute } from "../utils/APIRoutes";
@@ -10,6 +10,18 @@ import { loginRoute } from "../utils/APIRoutes";
 export default function Login() {
   const navigate = useNavigate();
   const [values, setValues] = useState({ username: "", password: "" });
+
+  const handleChange = event => {
+    setValues({ ...values, [event.target.name]: event.target.value });
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
+      navigate("/");
+    }
+  }, []);
+
+  //  toast options
   const toastOptions = {
     position: "bottom-right",
     autoClose: 8000,
@@ -17,16 +29,8 @@ export default function Login() {
     draggable: true,
     theme: "dark",
   };
-  useEffect(() => {
-    if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
-      navigate("/");
-    }
-  }, []);
 
-  const handleChange = (event) => {
-    setValues({ ...values, [event.target.name]: event.target.value });
-  };
-
+  // validations
   const validateForm = () => {
     const { username, password } = values;
     if (username === "") {
@@ -39,7 +43,8 @@ export default function Login() {
     return true;
   };
 
-  const handleSubmit = async (event) => {
+  // post request to loginRoute API
+  const handleSubmit = async event => {
     event.preventDefault();
     if (validateForm()) {
       const { username, password } = values;
@@ -55,7 +60,6 @@ export default function Login() {
           process.env.REACT_APP_LOCALHOST_KEY,
           JSON.stringify(data.user)
         );
-
         navigate("/");
       }
     }
@@ -64,27 +68,27 @@ export default function Login() {
   return (
     <>
       <FormContainer>
-        <form action="" onSubmit={(event) => handleSubmit(event)}>
+        <form onSubmit={event => handleSubmit(event)}>
           <div className="brand">
             <img src={Logo} alt="logo" />
-            <h1>snappy</h1>
+            <h1>Text-Tango</h1>
           </div>
           <input
             type="text"
-            placeholder="Username"
+            placeholder="Enter your username"
             name="username"
-            onChange={(e) => handleChange(e)}
+            onChange={e => handleChange(e)}
             min="3"
           />
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Enter your password"
             name="password"
-            onChange={(e) => handleChange(e)}
+            onChange={e => handleChange(e)}
           />
-          <button type="submit">Log In</button>
+          <button type="submit">LOGIN</button>
           <span>
-            Don't have an account ? <Link to="/register">Create One.</Link>
+            DON'T HAVE AN ACCOUNT ? <Link to="/register">REGISTER</Link>
           </span>
         </form>
       </FormContainer>
@@ -99,65 +103,61 @@ const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1rem;
   align-items: center;
-  background-color: #131324;
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    justify-content: center;
-    img {
-      height: 5rem;
-    }
-    h1 {
-      color: white;
-      text-transform: uppercase;
-    }
-  }
-
+  gap: 1rem;
+  background-color: #f1f1f1;
+  color: #007aff;
   form {
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    background-color: #00000076;
-    border-radius: 2rem;
-    padding: 5rem;
-  }
-  input {
-    background-color: transparent;
-    padding: 1rem;
-    border: 0.1rem solid #4e0eff;
-    border-radius: 0.4rem;
-    color: white;
-    width: 100%;
-    font-size: 1rem;
-    &:focus {
-      border: 0.1rem solid #997af0;
-      outline: none;
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      img {
+        height: 5rem;
+      }
+      h1 {
+        font-size: 2.5rem;
+      }
     }
-  }
-  button {
-    background-color: #4e0eff;
-    color: white;
-    padding: 1rem 2rem;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 0.4rem;
-    font-size: 1rem;
-    text-transform: uppercase;
-    &:hover {
-      background-color: #4e0eff;
+    input {
+      padding: 1rem;
+      border: 0.1rem solid #007aff;
+      border-radius: 0.4rem;
+      width: 100%;
+      font-size: 1rem;
+      &:focus {
+        outline: none;
+        border: 0.1rem solid #4e0eff;
+        box-shadow: 0 0 0.3rem #007aff;
+      }
     }
-  }
-  span {
-    color: white;
-    text-transform: uppercase;
-    a {
-      color: #4e0eff;
-      text-decoration: none;
+    button {
+      border: none;
+      background-color: #007aff;
+      color: white;
+      padding: 1rem 2rem;
       font-weight: bold;
+      cursor: pointer;
+      border-radius: 0.4rem;
+      font-size: 1rem;
+      &:hover {
+        border-color: #4e0eff;
+        box-shadow: 0 0 0.3rem #007aff;
+      }
+    }
+    span {
+      a {
+        color: #007aff;
+        text-decoration: none;
+        font-weight: bold;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 `;
