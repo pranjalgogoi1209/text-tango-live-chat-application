@@ -13,19 +13,22 @@ export default function SetAvatar() {
   const [avatars, setAvatars] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAvatar, setSelectedAvatar] = useState(undefined);
-  const toastOptions = {
-    position: "bottom-right",
-    autoClose: 8000,
-    pauseOnHover: true,
-    draggable: true,
-    theme: "dark",
-  };
 
   useEffect(async () => {
     if (!localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY))
       navigate("/login");
   }, []);
 
+  // toast options
+  const toastOptions = {
+    position: "bottom-right",
+    autoClose: 4000,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "dark",
+  };
+
+  // post request to setAvatarRoute API
   const setProfilePicture = async () => {
     if (selectedAvatar === undefined) {
       toast.error("Please select an avatar", toastOptions);
@@ -33,11 +36,9 @@ export default function SetAvatar() {
       const user = await JSON.parse(
         localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
       );
-
       const { data } = await axios.post(`${setAvatarRoute}/${user._id}`, {
         image: avatars[selectedAvatar],
       });
-
       if (data.isSet) {
         user.isAvatarImageSet = true;
         user.avatarImage = data.image;
@@ -52,9 +53,10 @@ export default function SetAvatar() {
     }
   };
 
+  // fetching the avatar api and randomly showing 8 avatars to select
   useEffect(async () => {
     const data = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 8; i++) {
       const image = await axios.get(
         `${api}/${Math.round(Math.random() * 1000)}`
       );
@@ -64,6 +66,7 @@ export default function SetAvatar() {
     setAvatars(data);
     setIsLoading(false);
   }, []);
+
   return (
     <>
       {isLoading ? (
@@ -105,46 +108,53 @@ export default function SetAvatar() {
 
 const Container = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
-  gap: 3rem;
-  background-color: #131324;
+  justify-content: center;
+  padding-top: 2rem;
+  align-items: center;
+  gap: 2rem;
+  background-color: #f1f1f1;
   height: 100vh;
   width: 100vw;
-
   .loader {
     max-inline-size: 100%;
   }
-
   .title-container {
     h1 {
-      color: white;
+      color: #007aff;
     }
   }
   .avatars {
     display: flex;
-    gap: 2rem;
-
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    width: 50rem;
+    height: 20rem;
     .avatar {
-      border: 0.4rem solid transparent;
-      padding: 0.4rem;
-      border-radius: 5rem;
       display: flex;
       justify-content: center;
       align-items: center;
+      border: 0.4rem solid transparent;
+      padding: 0.4rem;
+      border-radius: 5rem;
       transition: 0.5s ease-in-out;
       img {
         height: 6rem;
-        transition: 0.5s ease-in-out;
+        &:hover {
+          /* transition: 0.5s ease-in-out; */
+          border: 0.4rem solid #007aff;
+          border-radius: 5rem;
+        }
       }
     }
     .selected {
-      border: 0.4rem solid #4e0eff;
+      border: 0.4rem solid #007aff;
     }
   }
   .submit-btn {
-    background-color: #4e0eff;
+    background-color: #007aff;
     color: white;
     padding: 1rem 2rem;
     border: none;
@@ -154,7 +164,8 @@ const Container = styled.div`
     font-size: 1rem;
     text-transform: uppercase;
     &:hover {
-      background-color: #4e0eff;
+      border-color: #4e0eff;
+      box-shadow: 0 0 0.3rem #007aff;
     }
   }
 `;
