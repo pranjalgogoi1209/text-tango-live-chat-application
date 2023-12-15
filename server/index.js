@@ -1,11 +1,17 @@
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const authRoutes = require("./routes/auth");
-const messageRoutes = require("./routes/messages");
+// app.js
+import express from "express";
+import cors from "cors";
+import mongoose from "mongoose";
+import authRoutes from "./routes/auth.js";
+import messageRoutes from "./routes/messages.js";
+import { createServer } from "http"; 
+import { Server } from "socket.io";
+import dotenv from "dotenv";
+
+dotenv.config();
+
 const app = express();
-const socket = require("socket.io");
-require("dotenv").config();
+
 
 app.use(cors());
 app.use(express.json());
@@ -16,7 +22,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    console.log("DB Connetion Successfull");
+    console.log("DB Connection Successful");
   })
   .catch((err) => {
     console.log(err.message);
@@ -28,24 +34,43 @@ app.use("/api/messages", messageRoutes);
 const server = app.listen(process.env.PORT, () =>
   console.log(`Server started on ${process.env.PORT}`)
 );
-const io = socket(server, {
+
+// const httpServer = createServer(app); // Create an HTTP server
+const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     credentials: true,
   },
 });
 
-global.onlineUsers = new Map();
+let onlineUsers = [];
+
 io.on("connection", (socket) => {
-  global.chatSocket = socket;
   socket.on("add-user", (userId) => {
-    onlineUsers.set(userId, socket.id);
+    handleAddUser(socket, userId);
   });
 
   socket.on("send-msg", (data) => {
-    const sendUserSocket = onlineUsers.get(data.to);
-    if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("msg-recieve", data.msg);
-    }
+    handleSendMessage(socket, data);
   });
 });
+
+function handleAddUser(socket, userId) {
+  const existingUser = onlineUsers.find((item) => item.userId === userId);
+
+  if (existingUser) {
+    existingUser.socketId = socket.id;
+  } else {
+    onlineUsers.push({ userId, socketId: socket.id });
+  }
+  io.emit("onlineUsers", onlineUsers);
+  console.log(onlineUsers)
+}
+
+function handleSendMessage(socket, data) {
+  const sendUserSocket = onlineUsers.find((item) => item.userId === data.to);
+  console.log(data, sendUserSocket.socketId, onlineUsers)
+  if (sendUserSocket) {
+    socket.to(sendUserSocket.socketId).emit("receive", data.msg);
+  }
+}
