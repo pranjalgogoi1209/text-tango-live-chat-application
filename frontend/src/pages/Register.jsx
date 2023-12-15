@@ -17,15 +17,15 @@ export default function Register() {
     confirmPassword: "",
   });
 
+  const handleChange = event => {
+    setValues({ ...values, [event.target.name]: event.target.value });
+  };
+
   useEffect(() => {
     if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
       navigate("/");
     }
   }, []);
-
-  const handleChange = event => {
-    setValues({ ...values, [event.target.name]: event.target.value });
-  };
 
   // toast options
   const toastOptions = {
@@ -36,6 +36,7 @@ export default function Register() {
     theme: "light",
   };
 
+  // validations
   const handleValidation = () => {
     const { password, confirmPassword, username, email } = values;
     if (password !== confirmPassword) {
@@ -64,7 +65,7 @@ export default function Register() {
     return true;
   };
 
-  // register form submission
+  // post request to registerRoute API while successfully submitting the register form
   const handleSubmit = async event => {
     event.preventDefault();
     if (handleValidation()) {
