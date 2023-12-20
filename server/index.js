@@ -4,7 +4,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.js";
 import messageRoutes from "./routes/messages.js";
-import { createServer } from "http"; 
+import { createServer } from "http";
 import { Server } from "socket.io";
 import dotenv from "dotenv";
 
@@ -53,6 +53,10 @@ io.on("connection", (socket) => {
   socket.on("send-msg", (data) => {
     handleSendMessage(socket, data);
   });
+
+  socket.on("logout", (userId) => {
+    handleLogOut(socket, userId);
+  })
 });
 
 function handleAddUser(socket, userId) {
@@ -72,5 +76,14 @@ function handleSendMessage(socket, data) {
   console.log(data, sendUserSocket.socketId, onlineUsers)
   if (sendUserSocket) {
     socket.to(sendUserSocket.socketId).emit("receive", data.msg);
+  }
+}
+
+function handleLogOut(socket, userId){
+  const userIndex = onlineUsers.findIndex((item)=> item.userId === userId);
+  if(userIndex !== -1){
+    let  userSocketId = onlineUsers[userIndex].socketId;
+    onlineUsers = onlineUsers.filter((item) => item.socketId !== userSocketId);
+    io.emit("onlineUsers", onlineUsers);
   }
 }
